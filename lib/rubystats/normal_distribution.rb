@@ -1,7 +1,7 @@
 require 'rubystats/probability_distribution'
 # This class provides an object for encapsulating normal distributions
 # Ported to Ruby from PHPMath class by Bryan Donovan
-# Author:: Jaco van Kooten 
+# Author:: Jaco van Kooten
 # Author:: Paul Meagher
 # Author:: Bryan Donovan (http://www.bryandonovan.com)
 module Rubystats
@@ -10,7 +10,7 @@ module Rubystats
 
     # Constructs a normal distribution (defaults to zero mean and
     # unity variance).
-    def initialize(mu=0.0, sigma=1.0)
+    def initialize(mu=0.0, sigma=1.0, rng = Kernel)
       @mean = mu.to_f
       if sigma <= 0.0
         raise "error, invalid sigma #{sigma}, should be > 0"
@@ -20,10 +20,11 @@ module Rubystats
       @pdf_denominator = SQRT2PI * Math.sqrt(@variance)
       @cdf_denominator = SQRT2   * Math.sqrt(@variance)
       @use_last = nil
+      @rng = rng
     end
 
     # Returns the mean of the distribution
-    def get_mean 
+    def get_mean
       return @mean
     end
 
@@ -98,8 +99,8 @@ module Rubystats
       else
         w = 1
         until w < 1.0 do
-          r1 = Kernel.rand
-          r2 = Kernel.rand
+          r1 = @rng.rand
+          r2 = @rng.rand
           x1 = 2.0 * r1 - 1.0
           x2 = 2.0 * r2 - 1.0
           w  = x1 * x1 + x2 * x2

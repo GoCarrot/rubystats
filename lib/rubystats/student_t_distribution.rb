@@ -6,16 +6,16 @@ module Rubystats
     include Rubystats::SpecialMath
 
     # Constructs a student t distribution.
-    def initialize(degree_of_freedom=1.0)
+    def initialize(degree_of_freedom=1.0, rng = Kernel)
       raise "Argument Error: degrees of freedom for student t distribution must be greater than zero." if degree_of_freedom <= 0.0
-      @dof = degree_of_freedom.to_f   
-      @pdf_factor = Math.gamma((@dof + 1.0) / 2.0) / ( Math.sqrt(@dof * Math::PI) * Math.gamma(@dof / 2.0))	  
-	  @stdnorm = Rubystats::NormalDistribution.new(0.0,1.0)	  
+      @dof = degree_of_freedom.to_f
+      @pdf_factor = Math.gamma((@dof + 1.0) / 2.0) / ( Math.sqrt(@dof * Math::PI) * Math.gamma(@dof / 2.0))
+	  @stdnorm = Rubystats::NormalDistribution.new(0.0,1.0, rng)
     end
 
     # Returns the mean of the distribution
     def get_mean
-      (@dof > 1) ? 0.0 : Float::NAN      
+      (@dof > 1) ? 0.0 : Float::NAN
     end
 
     # Returns the standard deviation of the distribution
@@ -25,7 +25,7 @@ module Rubystats
 
     # Returns the variance of the distribution
     def get_variance
-      (@dof > 2.0) ? (@dof / (@dof - 2)) : Float::NAN      
+      (@dof > 2.0) ? (@dof / (@dof - 2)) : Float::NAN
     end
 
     private
@@ -33,7 +33,7 @@ module Rubystats
     # Obtain single PDF value
     # Returns the probability that a stochastic variable x has the value X,
     # i.e. P(x=X)
-    def get_pdf(x)      
+    def get_pdf(x)
       return @pdf_factor * (1.0 + (x**2.0) / @dof)**(-(@dof+1.0)/2.0)
     end
 

@@ -5,7 +5,7 @@ require 'rubystats/probability_distribution'
 # Author:: Paul Meagher
 # Author:: Bryan Donovan (http://www.bryandonovan.com)
 module Rubystats
-  class BinomialDistribution < Rubystats::ProbabilityDistribution 
+  class BinomialDistribution < Rubystats::ProbabilityDistribution
     include Rubystats::NumericalConstants
     include Rubystats::SpecialMath
     include Rubystats::ExtraMath
@@ -15,7 +15,7 @@ module Rubystats
     attr_writer :p, :n
 
     # Constructs a binomial distribution
-    def initialize (trials, prob)
+    def initialize (trials, prob, rng = Kernel)
       if trials <= 0
         raise ArgumentError.new("Error: trials must be greater than 0")
       end
@@ -24,6 +24,8 @@ module Rubystats
         raise ArgumentError.new("prob must be between 0 and 1")
       end
       @p = prob.to_f
+
+      @rng = rng
     end
 
     #returns the number of trials
@@ -67,43 +69,43 @@ module Rubystats
     def get_cdf(_x)
       check_range(_x, 0.0, @n)
       sum = 0.0
-      for i in (0 .. _x) 
+      for i in (0 .. _x)
         sum = sum + pdf(i)
       end
       sum
     end
 
-    # Inverse of the cumulative binomial distribution function     
+    # Inverse of the cumulative binomial distribution function
     # returns the value X for which P(x < _x).
     def get_icdf(prob)
       check_range(prob)
       sum = 0.0
       k = 0
-      until prob <= sum 
+      until prob <= sum
         sum += get_pdf(k)
         k += 1
-      end 
+      end
       k - 1
     end
 
-    # Private binomial RNG function    
-    # Variation of Luc Devroye's "Second Waiting Time Method" 
+    # Private binomial RNG function
+    # Variation of Luc Devroye's "Second Waiting Time Method"
     # on page 522 of his text "Non-Uniform Random Variate Generation."
-    # There are faster methods based on acceptance/rejection techniques, 
+    # There are faster methods based on acceptance/rejection techniques,
     # but they are substantially more complex to implement.
-    def get_rng      
-      p = (@p <= 0.5) ? @p : (1.0 - @p)        
+    def get_rng
+      p = (@p <= 0.5) ? @p : (1.0 - @p)
       log_q = Math.log(1.0 - p)
       sum = 0.0
       k = 0
       loop do
-        sum += Math.log(Kernel.rand) / (@n - k)
+        sum += Math.log(@rng.rand) / (@n - k)
         if (sum < log_q)
-          return (p != @p) ? (@n - k) : k          
+          return (p != @p) ? (@n - k) : k
         end
         k += 1
-      end     
-    end      
-  
+      end
+    end
+
   end
 end

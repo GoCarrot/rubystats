@@ -6,16 +6,17 @@ module Rubystats
 
     # Constructs a uniform distribution (defaults to zero lower and
     # unity upper bound).
-    def initialize(lower=0.0, upper=1.0)
+    def initialize(lower=0.0, upper=1.0, rng = Kernel)
       lower,upper = upper,lower if lower > upper
       @lower = lower.to_f
       @upper = upper.to_f
       @pdf_denominator = 1.0 / (@upper - @lower)
       @use_last = nil
+      @rng = rng
     end
 
     # Returns the mean of the distribution
-    def get_mean 
+    def get_mean
       return 0.5*(@lower + @upper)
     end
 
@@ -37,9 +38,9 @@ module Rubystats
     def get_pdf(x)
       if x >= @lower && x <= @upper
         @pdf_denominator
-      else 
+      else
         0.0
-      end	  
+      end
     end
 
     # Obtain single CDF value
@@ -50,9 +51,9 @@ module Rubystats
         (x - @lower).fdiv(@upper - @lower)
       elsif x >= @upper
         1.0
-      else 
+      else
         0.0
-      end	  
+      end
     end
 
     # Obtain single inverse CDF value.
@@ -64,7 +65,7 @@ module Rubystats
 
     # returns single random number
     def get_rng
-      return @lower + (@upper - @lower) * Kernel.rand
+      return @lower + (@upper - @lower) * @rng.rand
     end
   end
 end

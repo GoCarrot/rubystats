@@ -6,15 +6,15 @@ module Rubystats
     include Rubystats::SpecialMath
 
     # Constructs a lognormal distribution.
-    def initialize(meanlog=0.0, sdlog=1.0)
+    def initialize(meanlog=0.0, sdlog=1.0, rng = Kernel)
       raise "Argument Error: standard deviation for log-normal distribution must be positive." if sdlog < 0.0
       @meanlog = meanlog.to_f
-      @sdlog = sdlog.to_f      
-      @norm = Rubystats::NormalDistribution.new(@meanlog, @sdlog)
+      @sdlog = sdlog.to_f
+      @norm = Rubystats::NormalDistribution.new(@meanlog, @sdlog, rng)
     end
 
     # Returns the mean of the distribution
-    def get_mean 
+    def get_mean
       return Math.exp(@meanlog + @sdlog**2 / 2.0)
     end
 

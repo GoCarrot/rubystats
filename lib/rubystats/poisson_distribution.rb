@@ -1,15 +1,16 @@
 require 'rubystats/probability_distribution'
 
 module Rubystats
-  class PoissonDistribution < Rubystats::ProbabilityDistribution 
+  class PoissonDistribution < Rubystats::ProbabilityDistribution
     include Rubystats::MakeDiscrete
 
     # Constructs a Poisson distribution
-    def initialize (rate)
+    def initialize (rate, rng = Kernel)
       if rate <= 0.0
         raise ArgumentError.new("The rate for the Poisson distribution should be greater than zero.")
       end
       @rate = rate.to_f
+      @rng = rng
     end
 
     #returns the mean
@@ -42,21 +43,21 @@ module Rubystats
     def get_cdf(k)
       raise ArgumentError.new("Poisson pdf: k needs to be >= 0") if k < 0
       sum = 0.0
-      for i in (0 .. k) 
+      for i in (0 .. k)
         sum = sum + get_pdf(i)
       end
       return sum
     end
 
-    # Inverse of the cumulative Poisson distribution function 
+    # Inverse of the cumulative Poisson distribution function
     def get_icdf(prob)
       check_range(prob)
       sum = 0.0
       k = 0
-      until prob <= sum 
+      until prob <= sum
         sum += get_pdf(k)
         k += 1
-      end 
+      end
       return k - 1
     end
 
@@ -66,7 +67,7 @@ module Rubystats
       x = 0
       p = Math.exp(-@rate)
       s = p
-      u = Kernel.rand
+      u = @rng.rand
       while u > s
         x += 1
         p *= @rate / x.to_f
